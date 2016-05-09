@@ -36,7 +36,7 @@
 "\n"     return FIM_LINHA;
 "quit"   return QT;
 
-[a-zA-z]+ { strcpy(yylval.name,yytext);
+[a-zA-Z0-9./\()_]+[.]?[a-zA-Z0-9]* { strcpy(yylval.name,yytext);
             return (ID);
             }
 ".."      return ID ;
