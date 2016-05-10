@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <signal.h>
 void yyerror(char * msg);
 %}
 
 %union { float val ;
          }
+
 %union { char name[1024];
 }
 
@@ -22,24 +25,25 @@ void yyerror(char * msg);
 %%
 
 input :
-			| input linha { printf("%s %s >>", getprogname(),getenv("PWD"));}
+			| input linha { char pathname[512]; printf("%s:%s >>", getprogname(),getcwd(pathname, 512));}
 			;
 
 linha: FIM_LINHA
 			| expressao FIM_LINHA { printf("Valor : %g\n",$1);}
-      | KL NUMBER FIM_LINHA { char ex[1024];
-                              snprintf(ex , 1024 , "kill %d" , $2);
-                              system(ex);
+      | KL NUMBER FIM_LINHA {
+                              int process = $2;
+                              kill( process, SIGINT);
                               }
       | TC ID FIM_LINHA { char ex[1024]={}; strcat(ex, "touch ");strcat(ex, $2); system(ex);}
-      | CD ID FIM_LINHA { char ex[1024]={}; strcat(ex, "cd ");strcat(ex, $2); system(ex);pr}
+      | CD ID FIM_LINHA { char ex[1024]={}; getcwd(ex, 1042); strcat(ex, "/");strcat(ex, $2);
+                          if(chdir(ex) == -1) fprintf( stderr ," Diretorio nao localizado.");;}
       | MK ID FIM_LINHA { char ex[1024]={}; strcat(ex, "mkdir ");strcat(ex, $2); system(ex);}
       | RM ID FIM_LINHA { char ex[1024]={}; strcat(ex, "rmdir ");strcat(ex, $2); system(ex);}
-      | ST ID FIM_LINHA { char ex[1024]={}; strcat(ex, "open ");strcat(ex, $2); system(ex);}
+      | ST ID FIM_LINHA { char ex[1024]={}; strcat(ex, "open -a ");strcat(ex, $2); system(ex);}
       | LS FIM_LINHA { system("ls");}
       | PS FIM_LINHA { system("ps aux");}
-      | QT FIM_LINHA { printf("Encerrando o programa..."); exit(0);}
-      | ERROR FIM_LINHA { printf("Comando nao conhecido\n");return(0);}
+      | QT FIM_LINHA { fprintf(stderr, "Encerrando o programa...\n"); exit(0);}
+      | ERROR FIM_LINHA { yyerror("Comando nao conhecido\n");}
       ;
 
 expressao: termo { $$ = $1; }
@@ -54,7 +58,7 @@ termo: pri_expressao { $$ = $1; }
 															  else
 																	 {
 																 $$ = 0 ;
-																 fprintf(stderr, "divisao por 0\n");
+																 yyerror("divisao por 0\n");
 																 return(0);
 																	 }
 															 }
@@ -65,14 +69,14 @@ pri_expressao : NUMBER { $$ = $1 ;}
 
 int main(int argc, char **argv)
 {
-  {printf("%s:%s >>", getprogname(),getenv("PWD"));}
-   do {
+char pathname[512];
+printf("%s:%s >>", getprogname(),getcwd(pathname, 512));
     yyparse();
-  } while (1) ;
 }
 
 
 void yyerror(char *msg)
 {
-    fprintf(stderr, "%s\n" , msg);
+    fprintf(stderr, "Comando : %s\n" , msg);
+    yyparse();
 }

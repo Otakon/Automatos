@@ -106,11 +106,13 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "Myshell.y"
+#line 1 "MyShell.y"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <signal.h>
 void yyerror(char * msg);
 
 
@@ -134,14 +136,14 @@ void yyerror(char * msg);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 8 "Myshell.y"
+#line 10 "MyShell.y"
 { float val ;
          
-#line 10 "Myshell.y"
+#line 13 "MyShell.y"
  char name[1024];
 }
 /* Line 193 of yacc.c.  */
-#line 145 "Myshell.tab.c"
+#line 147 "MyShell.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -154,7 +156,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 158 "Myshell.tab.c"
+#line 160 "MyShell.tab.c"
 
 #ifdef short
 # undef short
@@ -446,9 +448,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    24,    24,    25,    28,    29,    30,    34,    35,    36,
-      37,    38,    39,    40,    41,    42,    45,    46,    47,    48,
-      51,    52,    53,    62
+       0,    27,    27,    28,    31,    32,    33,    37,    38,    40,
+      41,    42,    43,    44,    45,    46,    49,    50,    51,    52,
+      55,    56,    57,    66
 };
 #endif
 
@@ -1373,118 +1375,119 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 25 "Myshell.y"
-    { printf("%s %s >>", getprogname(),getenv("PWD"));;}
+#line 28 "MyShell.y"
+    { char pathname[512]; printf("%s:%s >>", getprogname(),getcwd(pathname, 512));;}
     break;
 
   case 5:
-#line 29 "Myshell.y"
+#line 32 "MyShell.y"
     { printf("Valor : %g\n",(yyvsp[(1) - (2)].val));;}
     break;
 
   case 6:
-#line 30 "Myshell.y"
-    { char ex[1024];
-                              snprintf(ex , 1024 , "kill %d" , (yyvsp[(2) - (3)].val));
-                              system(ex);
+#line 33 "MyShell.y"
+    {
+                              int process = (yyvsp[(2) - (3)].val);
+                              kill( process, SIGINT);
                               ;}
     break;
 
   case 7:
-#line 34 "Myshell.y"
+#line 37 "MyShell.y"
     { char ex[1024]={}; strcat(ex, "touch ");strcat(ex, (yyvsp[(2) - (3)].name)); system(ex);;}
     break;
 
   case 8:
-#line 35 "Myshell.y"
-    { char ex[1024]={}; strcat(ex, "cd ");strcat(ex, (yyvsp[(2) - (3)].name)); strcat(ex, "/");system(ex);;}
+#line 38 "MyShell.y"
+    { char ex[1024]={}; getcwd(ex, 1042); strcat(ex, "/");strcat(ex, (yyvsp[(2) - (3)].name));
+                          if(chdir(ex) == -1) fprintf( stderr ," Diretorio nao localizado.");;;}
     break;
 
   case 9:
-#line 36 "Myshell.y"
+#line 40 "MyShell.y"
     { char ex[1024]={}; strcat(ex, "mkdir ");strcat(ex, (yyvsp[(2) - (3)].name)); system(ex);;}
     break;
 
   case 10:
-#line 37 "Myshell.y"
+#line 41 "MyShell.y"
     { char ex[1024]={}; strcat(ex, "rmdir ");strcat(ex, (yyvsp[(2) - (3)].name)); system(ex);;}
     break;
 
   case 11:
-#line 38 "Myshell.y"
-    { char ex[1024]={}; strcat(ex, "open ");strcat(ex, (yyvsp[(2) - (3)].name)); system(ex);;}
+#line 42 "MyShell.y"
+    { char ex[1024]={}; strcat(ex, "open -a ");strcat(ex, (yyvsp[(2) - (3)].name)); system(ex);;}
     break;
 
   case 12:
-#line 39 "Myshell.y"
+#line 43 "MyShell.y"
     { system("ls");;}
     break;
 
   case 13:
-#line 40 "Myshell.y"
+#line 44 "MyShell.y"
     { system("ps aux");;}
     break;
 
   case 14:
-#line 41 "Myshell.y"
-    { printf("Encerrando o programa..."); exit(0);;}
+#line 45 "MyShell.y"
+    { fprintf(stderr, "Encerrando o programa...\n"); exit(0);;}
     break;
 
   case 15:
-#line 42 "Myshell.y"
-    { printf("Comando nao conhecido\n");return(0);;}
+#line 46 "MyShell.y"
+    { yyerror("Comando nao conhecido\n");;}
     break;
 
   case 16:
-#line 45 "Myshell.y"
+#line 49 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val); ;}
     break;
 
   case 17:
-#line 46 "Myshell.y"
+#line 50 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val) ; ;}
     break;
 
   case 18:
-#line 47 "Myshell.y"
+#line 51 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val) ; ;}
     break;
 
   case 19:
-#line 48 "Myshell.y"
+#line 52 "MyShell.y"
     { (yyval.val) = -(yyvsp[(2) - (2)].val) ; ;}
     break;
 
   case 20:
-#line 51 "Myshell.y"
+#line 55 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val); ;}
     break;
 
   case 21:
-#line 52 "Myshell.y"
+#line 56 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val) ; ;}
     break;
 
   case 22:
-#line 53 "Myshell.y"
+#line 57 "MyShell.y"
     { if ((yyvsp[(3) - (3)].val) != 0) (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val) ;
 															  else
 																	 {
 																 (yyval.val) = 0 ;
-																 fprintf(stderr, "divisao por 0\n");
+																 yyerror("divisao por 0\n");
 																 return(0);
 																	 }
 															 ;}
     break;
 
   case 23:
-#line 62 "Myshell.y"
+#line 66 "MyShell.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val) ;;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1488 "Myshell.tab.c"
+#line 1491 "MyShell.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1698,20 +1701,20 @@ yyreturn:
 }
 
 
-#line 64 "Myshell.y"
+#line 68 "MyShell.y"
 
 
 int main(int argc, char **argv)
 {
-  {printf("%s:%s >>", getprogname(),getenv("PWD"));}
-   do {
+char pathname[512];
+printf("%s:%s >>", getprogname(),getcwd(pathname, 512));
     yyparse();
-  } while (1) ;
 }
 
 
 void yyerror(char *msg)
 {
-    fprintf(stderr, "%s\n" , msg);
+    fprintf(stderr, "Comando : %s\n" , msg);
+    yyparse();
 }
 

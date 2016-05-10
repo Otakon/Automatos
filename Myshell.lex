@@ -24,7 +24,6 @@
 "-"      return '-';
 "*"      return '*';
 "/"      return '/';
-"calcula" return CC ;
 "cd"      return CD ;
 "kill"    return KL ;
 "rmdir"   return RM;
@@ -35,10 +34,10 @@
 [ \t]    ;
 "\n"     return FIM_LINHA;
 "quit"   return QT;
+.        return ERROR ;
 
-[a-zA-Z0-9./\()_]+[.]?[a-zA-Z0-9]* { strcpy(yylval.name,yytext);
+[a-zA-Z0-9./\()_]+ { strcpy(yylval.name,yytext);
             return (ID);
             }
-".."      return ID ;
-.         return ERROR ;
+
 %%

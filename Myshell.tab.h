@@ -80,14 +80,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 8 "Myshell.y"
+#line 10 "MyShell.y"
 { float val ;
          
-#line 10 "Myshell.y"
+#line 13 "MyShell.y"
  char name[1024];
 }
 /* Line 1529 of yacc.c.  */
-#line 91 "Myshell.tab.h"
+#line 91 "MyShell.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
